@@ -1,7 +1,7 @@
 // Karen Floridalma Laines Pablo
 // Carnet 1520722
 
-export class Product{
+class Product{
     private codigo: string;
     private nombre: string;
     private precio_costo: number;
@@ -49,182 +49,104 @@ export class Product{
     }
 }
 
-
-// Clase LinkedListNode
-class LinkedListNode {
+class Lnk_Node {
     private data: Product;
-    private nextNode: LinkedListNode | null;
+    private next!: Lnk_Node;
 
-    constructor(data: Product, nextNode: LinkedListNode | null = null) {
-        this.data = data
-        this.nextNode = nextNode
-
+    constructor(producto:Product){
+        this.data = producto;
     }
 
-    public setData(data: Product) {
-        this.data = data;
+    public setNext(next:Lnk_Node){
+        this.next = next;
     }
-
-    public getData(): Product {
-        return this.data;
-    }
-
-    public setNextNode(nextNode: LinkedListNode | null) {
-        this.nextNode = nextNode;
-    }
-
-    public getNextNode(): LinkedListNode | null {
-        return this.nextNode;
-    }
-}
-
-
-
-// Clase LinkedList
-class LinkedList {
-    private head: LinkedListNode | null = null;
-    private tail: LinkedListNode | null = null;
-    private size: number = 0;
-
-    constructor() { }
-
-    // Métodos Getters y Setters --------------------------------------------------------
-    public setSize(size: number) {
-        this.size = size;
-    }
-
-    public getSize(): number {
-        return this.size;
-    }
-
-    public setHead(head: LinkedListNode) {
-        this.head = head;
-    }
-
-    public getHead(): LinkedListNode | null {
-        return this.head;
-    }
-
-    public setTail(tail: LinkedListNode) {
-        this.tail = tail;
-    }
-
-    public getTail(): LinkedListNode | null {
-        return this.tail;
-    }
-
-    public isEmpty(): boolean {
-        return this.size === 0;
+    public getNext(){
+        return this.next;
     }
     
-    // Método append para la lista enlazada ----------------------------------------
-    public append(data:  Product): void {
-        const newNode = new LinkedListNode(data);
-
-        if (this.isEmpty()) {
-            this.head = newNode;
-            this.tail = newNode;
-        } else {
-            if (this.tail) {
-                this.tail.setNextNode(newNode);
-                this.tail = newNode;
-            }
-        }
-        this.size++;
-    }
-
-    public search(codigo: string): Product | null {
-        let current = this.head;
-        while (current !== null) {
-            if (current.getData().getCodigo() === codigo) {
-                return current.getData();
-            }
-            current = current.getNextNode();
-        }
-        return null;
-    }
-
-    public print(): void {
-        let current = this.head;
-        if (this.isEmpty()) {
-            console.log("Vacío");
-            return;
-        }
-        while (current !== null) {
-            console.log(current.getData().toString());
-            current = current.getNextNode();
-        }
+    public getProducto():Product{
+        return this.data;
     }
 }
 
-// Clase HashTable1
-class HashTable1 {
-    private size: number;
-    private data: LinkedList[];
+class Hashtable {
+private size: number;
+private data: Lnk_Node[];
 
-    constructor() {
-        this.size = 8;
-        this.data = new Array(this.size).fill(null).map(() => new LinkedList()); 
-        
-    }
+constructor(size:number){
+    this.data = new Array(size);
+    this.size = size;
+}
 
-// con el número de caracteres del nombre, se le da la posición
-    private hash(key:string):number{
+ //Con el número de caracteres del nombre, respecto al tamaño de la tabla
+private hash(key:string):number{
     return key.length % this.size;
 }
 
-    public insert(producto: Product): void {
-        const index = this.hash(producto.getNombre());
-        this.data[index].append(producto);
-
-    }
-
-    
-        //-------------------------------------------
-
-    public search(key: string): Product | null {
-        const index = this.hash(key);
-        const list = this.data[index];
-        const producto = list.search(key);
-        if (producto) {
-            console.log('Producto encontrado: ' + producto.getNombre() + ' - ' + producto.getCodigo() + 'Precio Costo: ' + producto.getPrecioCosto() + 'Precio Venta: ' + producto.getPrecioVenta());
-        } else {
-            console.log('Producto no encontrado');
+public insert(producto:Product): void {
+    let index:number = this.hash(producto.getNombre())
+    if (this.data[index] ==  undefined){
+        this.data[index] = new Lnk_Node(producto);
+    } else {
+        let node: Lnk_Node = this.data[index];
+        while (node.getNext()){
+            node = node.getNext();
         }
-        return producto;
-    }
-
-    public ShowSlots(): void {
-        console.log("Tabla Hash:");
-        for (let i = 0; i < this.size; i++) {
-            console.log(`Slot ${i}:`);
-            this.data[i].print();
-        }
+        node.setNext(new Lnk_Node(producto));
     }
 }
 
+public search(key:string):Product{
+    let index:number = this.hash(key);
+    let node = this.data[index];
+    while (node){
+        if (node.getProducto().getCodigo() == key){
+            return node.getProducto();
+        }
+        node = node.getNext()
+    }
+    return new Product("No", "registrado", 0, 0 );
 
-let productos: Product[] = [
-    new Product('P001', 'Pepto-Bismol', 50, 65),
-    new Product('P002', 'Acetaminofen', 10, 15),
-    new Product('P003', 'Aspirina',10, 25),
-    new Product('P004', 'Virogrip', 30, 45),
-    new Product('P005', 'Salandrews', 50, 55),
-    new Product('P006', 'aspirina forte', 15, 25),
-    new Product('P007', 'vitamina c', 50, 65),
-    new Product('P008', 'Calmadol', 50, 75),
-    new Product('P009', 'Dorival en gel', 60, 70),
-    new Product('P010', 'Dorival', 60, 85),
+    
+}
 
-];
+public to_string():string {
+    let txt:string = "";
+    for (let i = 0; i < this.data.length; i++){
+        txt += i+";";
+        let node = this.data[i];
+        while  (node){
+            txt += " " + node.getProducto().toString() + ", ";
+            node = node.getNext()
+        }
+        txt += "\n"
+    }
+    return txt;
 
-let miTablaHash = new HashTable1();
-productos.forEach(producto => miTablaHash.insert(producto));
+}
+}
 
-// Mostrar todos los slots
-miTablaHash.ShowSlots();
+let tabla:Hashtable = new Hashtable(10);
+let producto1 = new Product('P001', "Pepto-Bismol", 50, 65);
+let producto2 = new Product('P002', "Acetaminofen", 50, 65); // colision
+let producto3 = new Product('P003', "Aspirina", 50, 65);
+let producto4 = new Product('P004', "Vitamina c", 50, 65);
+let producto5 = new Product('P005', "vitamina d", 50, 65);
+let producto6 = new Product('P006', "Virogrip", 50, 65);
+let producto7 = new Product('P007', "Dorival en gel", 50, 65);
+let producto8 = new Product('P008', "Dorival", 50, 65);
+let producto9 = new Product('P009', "Aspirina Forte", 50, 65);
+let producto10 = new Product('P010', "Salandrews", 50, 65);
 
-// Búsqueda de estudiantes
-miTablaHash.search('Acetaminofen');
-miTablaHash.search('Aspirina');
-
+tabla.insert(producto1);
+tabla.insert(producto2);
+tabla.insert(producto3);
+tabla.insert(producto4);
+tabla.insert(producto6);
+tabla.insert(producto5);
+tabla.insert(producto7);
+tabla.insert(producto8);
+tabla.insert(producto9);
+tabla.insert(producto10);
+console.log(tabla.toString())
+console.log(tabla.search("P001").toString())
